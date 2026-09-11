@@ -53,4 +53,13 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.streakText, "1 day streak")
         XCTAssertEqual(viewModel.startButtonTitle, "Start pre-ride check")
     }
+
+    func test_reload_showsSetUpBike_whenMotorcycleIsMissing() {
+        defaults.removePersistentDomain(forName: suiteName)
+        store = UserDefaultsRideReadyStore(defaults: defaults)
+        let viewModel = HomeViewModel(store: store)
+
+        XCTAssertEqual(viewModel.motorcycleName, "No bike set up")
+        XCTAssertEqual(viewModel.bikeProfileButtonTitle, "Set up your motorcycle")
+    }
 }

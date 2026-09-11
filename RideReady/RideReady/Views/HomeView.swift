@@ -1,6 +1,7 @@
 import SwiftUI
 
 enum RideReadyRoute: Hashable {
+    case bikeProfile
     case checklist
     case itemDetail(InspectionItem)
     case rideReady
@@ -23,6 +24,11 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 16) {
                 Text(viewModel.motorcycleName)
                     .font(.largeTitle.bold())
+
+                Button(viewModel.bikeProfileButtonTitle) {
+                    path.append(.bikeProfile)
+                }
+                .font(.subheadline.weight(.semibold))
 
                 Text(viewModel.streakText)
                     .font(.subheadline.weight(.semibold))
@@ -60,6 +66,8 @@ struct HomeView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: RideReadyRoute.self) { route in
                 switch route {
+                case .bikeProfile:
+                    BikeProfileView(store: store, path: $path)
                 case .checklist:
                     ChecklistView(store: store, path: $path)
                 case .itemDetail(let item):
