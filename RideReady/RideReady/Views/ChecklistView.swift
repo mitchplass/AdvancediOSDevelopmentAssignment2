@@ -44,6 +44,21 @@ struct ChecklistView: View {
             }
 
             Spacer()
+
+            Button("Review ride ready") {
+                path.append(.rideReady)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .frame(maxWidth: .infinity)
+            .disabled(!viewModel.canReviewRideReady)
+
+            if !viewModel.canReviewRideReady {
+                Text("Check the remaining items before you log this ride.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+            }
         }
         .padding(24)
         .navigationTitle("Pre-ride check")
