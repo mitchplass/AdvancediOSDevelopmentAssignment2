@@ -52,6 +52,50 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.lastCheckText.hasPrefix("Last check: today,"))
         XCTAssertEqual(viewModel.streakText, "1 day streak")
         XCTAssertEqual(viewModel.startButtonTitle, "Start pre-ride check")
+        XCTAssertTrue(viewModel.isRideReady)
+        XCTAssertEqual(viewModel.rideReadyTitle, "Ride ready")
+    }
+
+    func test_reload_showsNotRideReady_whenNoCheckHasBeenLogged() {
+        let viewModel = HomeViewModel(store: store)
+
+        XCTAssertFalse(viewModel.isRideReady)
+        XCTAssertEqual(viewModel.rideReadyTitle, "Not ride ready")
+        XCTAssertEqual(viewModel.rideReadyDetail, "Do a pre-ride check before you leave.")
+    }
+
+    func test_reload_showsNotRideReady_whenWalkAroundIsInProgress() throws {
+        _ = try StartPreRideInspectionUseCase(store: store).start()
+        let viewModel = HomeViewModel(store: store)
+
+        XCTAssertFalse(viewModel.isRideReady)
+        XCTAssertEqual(viewModel.rideReadyTitle, "Not ride ready")
+        XCTAssertEqual(
+            viewModel.rideReadyDetail,
+            "Finish this walk-around before you treat the bike as ride ready."
+        )
+    }
+
+    func test_reload_showsNotRideReady_whenLastWalkAroundNeededAttention() throws {
+        try completeWalkAround(as: .notRideReady)
+        let viewModel = HomeViewModel(store: store)
+
+        XCTAssertFalse(viewModel.isRideReady)
+        XCTAssertEqual(viewModel.rideReadyTitle, "Not ride ready")
+        XCTAssertEqual(
+            viewModel.rideReadyDetail,
+            "Last walk-around found something that needs attention."
+        )
+    }
+
+    func test_reload_showsNotRideReady_whenLastReadyCheckWasYesterday() throws {
+        let yesterday = try XCTUnwrap(Calendar.current.date(byAdding: .day, value: -1, to: Date()))
+        try completeWalkAround(as: .readyToRide, now: { yesterday })
+        let viewModel = HomeViewModel(store: store)
+
+        XCTAssertFalse(viewModel.isRideReady)
+        XCTAssertEqual(viewModel.rideReadyTitle, "Not ride ready")
+        XCTAssertEqual(viewModel.rideReadyDetail, "Do a pre-ride check before you leave.")
     }
 
     func test_reload_showsSetUpBike_whenMotorcycleIsMissing() {
@@ -69,5 +113,21 @@ final class HomeViewModelTests: XCTestCase {
         let viewModel = HomeViewModel(store: store)
 
         XCTAssertEqual(viewModel.motorcyclePhoto, photo)
+    }
+
+    private func completeWalkAround(
+        as readiness: RideReadiness,
+        now: @escaping () -> Date = Date.init
+    ) throws {
+        _ = try StartPreRideInspectionUseCase(store: store).start()
+        let record = RecordInspectionFindingUseCase(store: store)
+        let items = Motorcycle.yamahaMT07().requiredInspectionItems()
+        for item in items {
+            let result: InspectionResult = (readiness == .notRideReady && item == .tyres)
+                ? .needsAttention
+                : .ok
+            try record.record(result, for: item)
+        }
+        _ = try CompletePreRideInspectionUseCase(store: store, now: now).complete(as: readiness)
     }
 }
