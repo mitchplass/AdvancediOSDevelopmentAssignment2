@@ -108,6 +108,7 @@ final class CompletePreRideInspectionUseCaseTests: XCTestCase {
         try completeFullCheck(on: laterSameDay)
 
         XCTAssertEqual(store.streak().consecutiveDays, 1)
+        XCTAssertEqual(store.streak().lastCompletedOn, laterSameDay)
     }
 
     func test_completeInspection_resetsStreak_afterAMissedDay() throws {

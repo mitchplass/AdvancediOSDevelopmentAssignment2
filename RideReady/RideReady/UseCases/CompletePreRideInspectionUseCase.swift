@@ -51,7 +51,10 @@ struct CompletePreRideInspectionUseCase {
         }
 
         if calendar.isDate(date, inSameDayAs: lastCompletedOn) {
-            return streak
+            return SafetyStreak(
+                consecutiveDays: streak.consecutiveDays,
+                lastCompletedOn: date
+            )
         }
 
         if let previousDay = calendar.date(byAdding: .day, value: -1, to: date),
