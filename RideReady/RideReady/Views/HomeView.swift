@@ -69,6 +69,11 @@ struct HomeView: View {
                 }
             }
             .onAppear { viewModel.reload() }
+            .onChange(of: path) { _, newPath in
+                if newPath.isEmpty {
+                    viewModel.reload()
+                }
+            }
             .alert("Can't start this check", isPresented: $showingError, actions: {
                 Button("OK", role: .cancel) {}
             }, message: {
