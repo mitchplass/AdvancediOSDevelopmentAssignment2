@@ -1,0 +1,14 @@
+import Foundation
+
+/// Loads and saves the motorcycle, walk-arounds, and safety streak.
+///
+/// Business Rule: an inspection cannot start without a motorcycle profile.
+protocol RideReadyStoring {
+    func motorcycle() -> Motorcycle?
+    func save(_ motorcycle: Motorcycle)
+    func activeInspection() -> PreRideInspection?
+    func save(_ inspection: PreRideInspection)
+    func latestCompletedInspection() -> PreRideInspection?
+    func streak() -> SafetyStreak
+    func save(_ streak: SafetyStreak)
+}
