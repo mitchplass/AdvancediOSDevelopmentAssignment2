@@ -12,63 +12,66 @@ struct BikeProfileView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Bike name")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            TextField("Yamaha MT-07", text: $viewModel.name)
-                .textFieldStyle(.roundedBorder)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Bike name")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    TextField("Yamaha MT-07", text: $viewModel.name)
+                        .textFieldStyle(.roundedBorder)
 
-            Text("Final drive")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Picker("Final drive", selection: $viewModel.finalDrive) {
-                ForEach(FinalDrive.allCases, id: \.self) { drive in
-                    Text(drive.title).tag(drive)
+                    Text("Final drive")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Picker("Final drive", selection: $viewModel.finalDrive) {
+                        ForEach(FinalDrive.allCases, id: \.self) { drive in
+                            Text(drive.title).tag(drive)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Front tyre")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Stepper(
+                            "\(viewModel.frontTyrePressurePSI) psi",
+                            value: $viewModel.frontTyrePressurePSI,
+                            in: viewModel.tyrePressureRange
+                        )
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.background, in: RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(uiColor: .separator), lineWidth: 1)
+                    )
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Rear tyre")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Stepper(
+                            "\(viewModel.rearTyrePressurePSI) psi",
+                            value: $viewModel.rearTyrePressurePSI,
+                            in: viewModel.tyrePressureRange
+                        )
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.background, in: RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(uiColor: .separator), lineWidth: 1)
+                    )
+
+                    Text("The next walk-around will use this bike's checks and tyre pressures.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
             }
-            .pickerStyle(.segmented)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Front tyre")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Stepper(
-                    "\(viewModel.frontTyrePressurePSI) psi",
-                    value: $viewModel.frontTyrePressurePSI,
-                    in: viewModel.tyrePressureRange
-                )
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.background, in: RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color(uiColor: .separator), lineWidth: 1)
-            )
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Rear tyre")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Stepper(
-                    "\(viewModel.rearTyrePressurePSI) psi",
-                    value: $viewModel.rearTyrePressurePSI,
-                    in: viewModel.tyrePressureRange
-                )
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.background, in: RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color(uiColor: .separator), lineWidth: 1)
-            )
-
-            Text("The next walk-around will use this bike's checks and tyre pressures.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-
-            Spacer()
+            .scrollDismissesKeyboard(.interactively)
 
             Button("Save bike") {
                 viewModel.save()
