@@ -52,4 +52,23 @@ final class UserDefaultsRideReadyStoreTests: XCTestCase {
 
         XCTAssertEqual(reloaded.streak().consecutiveDays, 3)
     }
+
+    func test_activeInspection_isNil_afterInspectionIsCompleted() {
+        var inspection = PreRideInspection(
+            id: UUID(),
+            motorcycle: Motorcycle.yamahaMT07(),
+            startedAt: Date(),
+            findings: []
+        )
+
+        store.save(inspection)
+        XCTAssertEqual(store.activeInspection()?.id, inspection.id)
+
+        inspection.completedAt = Date()
+        inspection.readiness = .readyToRide
+        store.save(inspection)
+
+        XCTAssertNil(store.activeInspection())
+        XCTAssertEqual(store.latestCompletedInspection()?.id, inspection.id)
+    }
 }
