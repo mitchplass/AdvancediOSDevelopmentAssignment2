@@ -3,6 +3,7 @@ import SwiftUI
 enum RideReadyRoute: Hashable {
     case checklist
     case itemDetail(InspectionItem)
+    case rideReady
 }
 
 struct HomeView: View {
@@ -63,6 +64,8 @@ struct HomeView: View {
                     ChecklistView(store: store, path: $path)
                 case .itemDetail(let item):
                     ItemDetailView(item: item, store: store)
+                case .rideReady:
+                    RideReadyView(store: store, path: $path)
                 }
             }
             .onAppear { viewModel.reload() }
