@@ -1,17 +1,20 @@
-//
-//  RideReadyApp.swift
-//  RideReady
-//
-//  Created by Mitchell Plass on 11/9/2026.
-//
-
 import SwiftUI
 
 @main
 struct RideReadyApp: App {
+    private let store: RideReadyStoring
+
+    init() {
+        let store = UserDefaultsRideReadyStore()
+        if store.motorcycle() == nil {
+            store.save(.yamahaMT07())
+        }
+        self.store = store
+    }
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView(store: store)
         }
     }
 }
