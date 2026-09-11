@@ -7,6 +7,7 @@ final class HomeViewModel: ObservableObject {
     @Published private(set) var streakText = "0 day streak"
     @Published private(set) var lastCheckText = "No checks logged yet"
     @Published private(set) var startButtonTitle = "Start pre-ride check"
+    @Published private(set) var bikeProfileButtonTitle = "Edit bike profile"
     @Published var riderError: String?
 
     private let store: RideReadyStoring
@@ -34,6 +35,9 @@ final class HomeViewModel: ObservableObject {
         startButtonTitle = store.activeInspection() == nil
             ? "Start pre-ride check"
             : "Continue pre-ride check"
+        bikeProfileButtonTitle = store.motorcycle() == nil
+            ? "Set up your motorcycle"
+            : "Edit bike profile"
     }
 
     func startOrContinueCheck() -> Bool {

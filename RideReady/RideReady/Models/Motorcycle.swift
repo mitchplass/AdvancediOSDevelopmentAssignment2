@@ -3,10 +3,18 @@ import Foundation
 /// How power reaches the rear wheel: chain, shaft, or belt.
 ///
 /// Business Rule: only chain motorcycles require a chain inspection item.
-enum FinalDrive: String, Codable {
+enum FinalDrive: String, Codable, CaseIterable {
     case chain
     case shaft
     case belt
+
+    var title: String {
+        switch self {
+        case .chain: return "Chain"
+        case .shaft: return "Shaft"
+        case .belt: return "Belt"
+        }
+    }
 }
 
 /// The motorbike the rider inspects before a ride.
