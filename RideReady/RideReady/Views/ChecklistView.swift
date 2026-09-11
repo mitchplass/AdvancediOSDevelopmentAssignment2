@@ -64,6 +64,9 @@ struct ChecklistView: View {
         .navigationTitle("Pre-ride check")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { viewModel.reload() }
+        .onChange(of: path) { _, _ in
+            viewModel.reload()
+        }
     }
 
     private var progress: Double {
