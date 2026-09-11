@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Business Rule: increments on the next calendar day; same-day repeats do not
 /// count; a missed day resets to 1.
-struct SafetyStreak {
+struct SafetyStreak: Codable {
     var consecutiveDays: Int
     var lastCompletedOn: Date?
 }

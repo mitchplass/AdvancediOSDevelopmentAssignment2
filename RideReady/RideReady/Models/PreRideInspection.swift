@@ -1,7 +1,7 @@
 import Foundation
 
 /// The rider's judgement of one inspection item.
-enum InspectionResult {
+enum InspectionResult: String, Codable {
     case ok
     case needsAttention
 }
@@ -9,7 +9,7 @@ enum InspectionResult {
 /// One item result recorded during a pre-ride walk-around.
 ///
 /// Business Rule: `needsAttention` means the inspection cannot complete as ride-ready.
-struct InspectionFinding {
+struct InspectionFinding: Codable {
     let item: InspectionItem
     let result: InspectionResult
 }
@@ -17,7 +17,7 @@ struct InspectionFinding {
 /// Whether the rider may leave after this walk-around.
 ///
 /// Business Rule: `readyToRide` requires every item to be `ok`.
-enum RideReadiness {
+enum RideReadiness: String, Codable {
     case readyToRide
     case notRideReady
 }
@@ -25,7 +25,7 @@ enum RideReadiness {
 /// A walk-around of the motorcycle before the rider leaves.
 ///
 /// Business Rule: cannot be `readyToRide` while items are unchecked or need attention.
-struct PreRideInspection {
+struct PreRideInspection: Codable {
     let id: UUID
     let motorcycle: Motorcycle
     let startedAt: Date

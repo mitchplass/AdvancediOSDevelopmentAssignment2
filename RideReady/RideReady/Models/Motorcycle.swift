@@ -3,7 +3,7 @@ import Foundation
 /// How power reaches the rear wheel: chain, shaft, or belt.
 ///
 /// Business Rule: only chain motorcycles require a chain inspection item.
-enum FinalDrive {
+enum FinalDrive: String, Codable {
     case chain
     case shaft
     case belt
@@ -13,7 +13,7 @@ enum FinalDrive {
 ///
 /// Business Rule: the checklist must match `finalDrive` so chain riders are
 /// asked about the chain and shaft riders are not.
-struct Motorcycle {
+struct Motorcycle: Codable {
     var name: String
     var finalDrive: FinalDrive
     var frontTyrePressurePSI: Int

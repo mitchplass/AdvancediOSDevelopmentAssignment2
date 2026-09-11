@@ -11,7 +11,7 @@ protocol RideSafetyCheckable {
 ///
 /// Business Rule: chain bikes include a chain check; shaft and belt bikes
 /// include a final-drive check instead.
-enum InspectionItem: String, CaseIterable {
+enum InspectionItem: String, CaseIterable, Codable {
     case tyres
     case chain
     case finalDrive
