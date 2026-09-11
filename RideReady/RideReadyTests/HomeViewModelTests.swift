@@ -38,4 +38,19 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.startOrContinueCheck())
         XCTAssertNil(viewModel.riderError)
     }
+
+    func test_reload_showsToday_whenLastCheckWasThisMorning() throws {
+        _ = try StartPreRideInspectionUseCase(store: store).start()
+        let record = RecordInspectionFindingUseCase(store: store)
+        for item in Motorcycle.yamahaMT07().requiredInspectionItems() {
+            try record.record(.ok, for: item)
+        }
+        _ = try CompletePreRideInspectionUseCase(store: store).complete(as: .readyToRide)
+
+        let viewModel = HomeViewModel(store: store)
+
+        XCTAssertTrue(viewModel.lastCheckText.hasPrefix("Last check: today,"))
+        XCTAssertEqual(viewModel.streakText, "1 day streak")
+        XCTAssertEqual(viewModel.startButtonTitle, "Start pre-ride check")
+    }
 }
