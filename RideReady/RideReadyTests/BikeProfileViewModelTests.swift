@@ -26,6 +26,9 @@ final class BikeProfileViewModelTests: XCTestCase {
         viewModel.finalDrive = .chain
         viewModel.frontTyrePressurePSI = 32
         viewModel.rearTyrePressurePSI = 36
+        viewModel.chainSlackMinMillimetres = 20
+        viewModel.chainSlackMaxMillimetres = 30
+        viewModel.photoData = Data("cb500-photo".utf8)
 
         viewModel.save()
 
@@ -33,6 +36,9 @@ final class BikeProfileViewModelTests: XCTestCase {
         XCTAssertEqual(store.motorcycle()?.name, "Honda CB500F")
         XCTAssertEqual(store.motorcycle()?.frontTyrePressurePSI, 32)
         XCTAssertEqual(store.motorcycle()?.rearTyrePressurePSI, 36)
+        XCTAssertEqual(store.motorcycle()?.chainSlackMinMillimetres, 20)
+        XCTAssertEqual(store.motorcycle()?.chainSlackMaxMillimetres, 30)
+        XCTAssertEqual(store.motorcyclePhoto(), Data("cb500-photo".utf8))
     }
 
     func test_save_fails_whenNameIsMissing() {

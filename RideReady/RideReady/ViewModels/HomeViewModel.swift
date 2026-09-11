@@ -4,6 +4,7 @@ import Foundation
 /// Home screen state: bike, streak, and starting or continuing a walk-around.
 final class HomeViewModel: ObservableObject {
     @Published private(set) var motorcycleName = ""
+    @Published private(set) var motorcyclePhoto: Data?
     @Published private(set) var streakText = "0 day streak"
     @Published private(set) var lastCheckText = "No checks logged yet"
     @Published private(set) var startButtonTitle = "Start pre-ride check"
@@ -21,6 +22,7 @@ final class HomeViewModel: ObservableObject {
 
     func reload() {
         motorcycleName = store.motorcycle()?.name ?? "No bike set up"
+        motorcyclePhoto = store.motorcyclePhoto()
         let days = store.streak().consecutiveDays
         streakText = days == 1 ? "1 day streak" : "\(days) day streak"
         if let last = store.latestCompletedInspection()?.completedAt {

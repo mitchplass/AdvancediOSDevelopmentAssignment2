@@ -62,4 +62,12 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.motorcycleName, "No bike set up")
         XCTAssertEqual(viewModel.bikeProfileButtonTitle, "Set up your motorcycle")
     }
+
+    func test_reload_showsBikePhoto_whenRiderHasSavedOne() {
+        let photo = Data("home-bike".utf8)
+        store.saveMotorcyclePhoto(photo)
+        let viewModel = HomeViewModel(store: store)
+
+        XCTAssertEqual(viewModel.motorcyclePhoto, photo)
+    }
 }
