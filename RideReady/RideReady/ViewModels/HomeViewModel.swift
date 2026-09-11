@@ -23,7 +23,11 @@ final class HomeViewModel: ObservableObject {
         let days = store.streak().consecutiveDays
         streakText = days == 1 ? "1 day streak" : "\(days) day streak"
         if let last = store.latestCompletedInspection()?.completedAt {
-            lastCheckText = "Last check: \(Self.lastCheckFormatter.string(from: last))"
+            if Calendar.current.isDateInToday(last) {
+                lastCheckText = "Last check: today, \(Self.lastCheckTimeFormatter.string(from: last))"
+            } else {
+                lastCheckText = "Last check: \(Self.lastCheckFormatter.string(from: last))"
+            }
         } else {
             lastCheckText = "No checks logged yet"
         }
@@ -50,6 +54,13 @@ final class HomeViewModel: ObservableObject {
     private static let lastCheckFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter
+    }()
+
+    private static let lastCheckTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .none
         formatter.timeStyle = .short
         return formatter
     }()
