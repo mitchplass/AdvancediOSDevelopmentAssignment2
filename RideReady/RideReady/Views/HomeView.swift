@@ -22,33 +22,37 @@ struct HomeView: View {
     var body: some View {
         NavigationStack(path: $path) {
             VStack(alignment: .leading, spacing: 16) {
-                Text(viewModel.motorcycleName)
-                    .font(.largeTitle.bold())
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        BikePhotoView(data: viewModel.motorcyclePhoto, height: 180)
 
-                Button(viewModel.bikeProfileButtonTitle) {
-                    path.append(.bikeProfile)
+                        Text(viewModel.motorcycleName)
+                            .font(.largeTitle.bold())
+
+                        Button(viewModel.bikeProfileButtonTitle) {
+                            path.append(.bikeProfile)
+                        }
+                        .font(.subheadline.weight(.semibold))
+
+                        Text(viewModel.streakText)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.accentColor)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.accentColor.opacity(0.12), in: Capsule())
+
+                        Text(viewModel.lastCheckText)
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.background, in: RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(uiColor: .separator), lineWidth: 1)
+                            )
+                    }
                 }
-                .font(.subheadline.weight(.semibold))
-
-                Text(viewModel.streakText)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.accentColor)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.accentColor.opacity(0.12), in: Capsule())
-
-                Text(viewModel.lastCheckText)
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.background, in: RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color(uiColor: .separator), lineWidth: 1)
-                    )
-
-                Spacer()
 
                 Button(viewModel.startButtonTitle) {
                     if viewModel.startOrContinueCheck() {

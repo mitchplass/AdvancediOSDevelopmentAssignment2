@@ -1,9 +1,11 @@
+import PhotosUI
 import SwiftUI
 
 struct BikeProfileView: View {
     @StateObject private var viewModel: BikeProfileViewModel
     @Binding var path: [RideReadyRoute]
     @State private var showingError = false
+    @State private var pickerItem: PhotosPickerItem?
 
     init(store: RideReadyStoring, path: Binding<[RideReadyRoute]>) {
         _viewModel = StateObject(wrappedValue: BikeProfileViewModel(store: store))
@@ -14,6 +16,32 @@ struct BikeProfileView: View {
         VStack(alignment: .leading, spacing: 16) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    PhotosPicker(selection: $pickerItem, matching: .images) {
+                        BikePhotoView(data: viewModel.photoData, height: 180)
+                    }
+                    .buttonStyle(.plain)
+                    .onChange(of: pickerItem) { _, item in
+                        Task {
+                            guard let item,
+                                  let data = try? await item.loadTransferable(type: Data.self) else {
+                                return
+                            }
+                            viewModel.setPhoto(from: data)
+                        }
+                    }
+
+                    if viewModel.photoData != nil {
+                        Button("Remove bike photo", role: .destructive) {
+                            viewModel.removePhoto()
+                            pickerItem = nil
+                        }
+                        .font(.subheadline)
+                    } else {
+                        Text("Tap the photo to add a picture of your bike.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+
                     Text("Bike name")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -30,43 +58,38 @@ struct BikeProfileView: View {
                     }
                     .pickerStyle(.segmented)
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Front tyre")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Stepper(
-                            "\(viewModel.frontTyrePressurePSI) psi",
-                            value: $viewModel.frontTyrePressurePSI,
-                            in: viewModel.tyrePressureRange
-                        )
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.background, in: RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color(uiColor: .separator), lineWidth: 1)
+                    specCard(
+                        title: "Front tyre",
+                        value: $viewModel.frontTyrePressurePSI,
+                        range: viewModel.tyrePressureRange,
+                        unit: "psi"
+                    )
+                    specCard(
+                        title: "Rear tyre",
+                        value: $viewModel.rearTyrePressurePSI,
+                        range: viewModel.tyrePressureRange,
+                        unit: "psi"
                     )
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Rear tyre")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Stepper(
-                            "\(viewModel.rearTyrePressurePSI) psi",
-                            value: $viewModel.rearTyrePressurePSI,
-                            in: viewModel.tyrePressureRange
+                    if viewModel.finalDrive == .chain {
+                        specCard(
+                            title: "Chain slack min",
+                            value: $viewModel.chainSlackMinMillimetres,
+                            range: viewModel.chainSlackRange,
+                            unit: "mm"
                         )
+                        specCard(
+                            title: "Chain slack max",
+                            value: $viewModel.chainSlackMaxMillimetres,
+                            range: viewModel.chainSlackRange,
+                            unit: "mm"
+                        )
+                        Text("The chain check will ask you to look for this slack so you know how tight it should feel.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.background, in: RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color(uiColor: .separator), lineWidth: 1)
-                    )
 
-                    Text("The next walk-around will use this bike's checks and tyre pressures.")
+                    Text("The next walk-around will use this bike's checks, tyre pressures, and chain spec.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -93,5 +116,26 @@ struct BikeProfileView: View {
         }, message: {
             Text(viewModel.riderError ?? "")
         })
+    }
+
+    private func specCard(
+        title: String,
+        value: Binding<Int>,
+        range: ClosedRange<Int>,
+        unit: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Stepper("\(value.wrappedValue) \(unit)", value: value, in: range)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.background, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color(uiColor: .separator), lineWidth: 1)
+        )
     }
 }
