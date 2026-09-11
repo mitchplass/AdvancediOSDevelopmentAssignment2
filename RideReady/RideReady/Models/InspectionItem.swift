@@ -33,6 +33,10 @@ enum InspectionItem: String, CaseIterable, Codable {
         case .tyres:
             return "Check front \(motorcycle.frontTyrePressurePSI) psi and rear \(motorcycle.rearTyrePressurePSI) psi."
         case .chain:
+            if let min = motorcycle.chainSlackMinMillimetres,
+               let max = motorcycle.chainSlackMaxMillimetres {
+                return "Check lubrication and slack. Slack should be \(min)–\(max) mm."
+            }
             return "Check tension and lubrication."
         case .finalDrive:
             if motorcycle.finalDrive == .shaft {

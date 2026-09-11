@@ -4,6 +4,7 @@ import Foundation
 final class UserDefaultsRideReadyStore: RideReadyStoring {
     private enum Key {
         static let motorcycle = "rideReady.motorcycle"
+        static let motorcyclePhoto = "rideReady.motorcyclePhoto"
         static let inspections = "rideReady.inspections"
         static let streak = "rideReady.streak"
     }
@@ -22,6 +23,18 @@ final class UserDefaultsRideReadyStore: RideReadyStoring {
 
     func save(_ motorcycle: Motorcycle) {
         encode(motorcycle, forKey: Key.motorcycle)
+    }
+
+    func motorcyclePhoto() -> Data? {
+        defaults.data(forKey: Key.motorcyclePhoto)
+    }
+
+    func saveMotorcyclePhoto(_ data: Data?) {
+        if let data {
+            defaults.set(data, forKey: Key.motorcyclePhoto)
+        } else {
+            defaults.removeObject(forKey: Key.motorcyclePhoto)
+        }
     }
 
     func activeInspection() -> PreRideInspection? {
