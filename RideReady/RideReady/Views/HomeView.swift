@@ -34,6 +34,26 @@ struct HomeView: View {
                         }
                         .font(.subheadline.weight(.semibold))
 
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: viewModel.isRideReady ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                                .font(.title2)
+                                .foregroundStyle(viewModel.isRideReady ? Color.green : Color.accentColor)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(viewModel.rideReadyTitle)
+                                    .font(.headline)
+                                Text(viewModel.rideReadyDetail)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer(minLength: 0)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            (viewModel.isRideReady ? Color.green : Color.accentColor).opacity(0.12),
+                            in: RoundedRectangle(cornerRadius: 12)
+                        )
+
                         Text(viewModel.streakText)
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(Color.accentColor)
