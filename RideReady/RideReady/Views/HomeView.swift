@@ -3,20 +3,22 @@ import SwiftUI
 enum RideReadyRoute: Hashable {
     case checklist
     case itemDetail(InspectionItem)
-    case rideReady
 }
 
 struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
+    @State private var path: [RideReadyRoute] = []
     @State private var showingError = false
-    @State private var checkStarted = false
+
+    private let store: RideReadyStoring
 
     init(store: RideReadyStoring) {
+        self.store = store
         _viewModel = StateObject(wrappedValue: HomeViewModel(store: store))
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(alignment: .leading, spacing: 16) {
                 Text(viewModel.motorcycleName)
                     .font(.largeTitle.bold())
@@ -39,18 +41,11 @@ struct HomeView: View {
                             .stroke(Color(uiColor: .separator), lineWidth: 1)
                     )
 
-                if checkStarted {
-                    Text("Walk-around started. Open the checklist to inspect the bike.")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                }
-
                 Spacer()
 
                 Button(viewModel.startButtonTitle) {
                     if viewModel.startOrContinueCheck() {
-                        checkStarted = true
-                        viewModel.reload()
+                        path.append(.checklist)
                     } else {
                         showingError = viewModel.riderError != nil
                     }
@@ -62,6 +57,14 @@ struct HomeView: View {
             .padding(24)
             .navigationTitle("RideReady")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: RideReadyRoute.self) { route in
+                switch route {
+                case .checklist:
+                    ChecklistView(store: store, path: $path)
+                case .itemDetail(let item):
+                    ItemDetailView(item: item, store: store)
+                }
+            }
             .onAppear { viewModel.reload() }
             .alert("Can't start this check", isPresented: $showingError, actions: {
                 Button("OK", role: .cancel) {}
