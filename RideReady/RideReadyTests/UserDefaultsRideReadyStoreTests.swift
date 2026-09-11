@@ -28,6 +28,15 @@ final class UserDefaultsRideReadyStoreTests: XCTestCase {
         XCTAssertEqual(reloaded.motorcycle()?.finalDrive, .chain)
     }
 
+    func test_saveMotorcyclePhoto_isStillThereAfterCreatingANewStore() {
+        let photo = Data("bike-jpeg".utf8)
+        store.saveMotorcyclePhoto(photo)
+
+        let reloaded = UserDefaultsRideReadyStore(defaults: defaults)
+
+        XCTAssertEqual(reloaded.motorcyclePhoto(), photo)
+    }
+
     func test_completedInspection_isStillCompletedAfterCreatingANewStore() {
         var inspection = PreRideInspection(
             id: UUID(),

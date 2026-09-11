@@ -32,4 +32,13 @@ final class MotorcycleInspectionItemTests: XCTestCase {
         XCTAssertTrue(guidance.contains("36 psi"))
         XCTAssertTrue(guidance.contains("42 psi"))
     }
+
+    func test_chainGuidance_usesMotorcycleSlackRange() {
+        let motorcycle = Motorcycle.yamahaMT07()
+        let guidance = InspectionItem.chain.guidance(for: motorcycle)
+
+        XCTAssertTrue(guidance.contains("25"))
+        XCTAssertTrue(guidance.contains("35"))
+        XCTAssertTrue(guidance.contains("mm"))
+    }
 }

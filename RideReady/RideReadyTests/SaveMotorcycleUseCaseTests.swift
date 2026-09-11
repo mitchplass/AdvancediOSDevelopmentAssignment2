@@ -28,7 +28,9 @@ final class SaveMotorcycleUseCaseTests: XCTestCase {
                 name: "  Honda CB500F  ",
                 finalDrive: .chain,
                 frontTyrePressurePSI: 32,
-                rearTyrePressurePSI: 36
+                rearTyrePressurePSI: 36,
+                chainSlackMinMillimetres: 25,
+                chainSlackMaxMillimetres: 35
             )
         )
 
@@ -36,6 +38,8 @@ final class SaveMotorcycleUseCaseTests: XCTestCase {
         XCTAssertEqual(store.motorcycle()?.name, "Honda CB500F")
         XCTAssertEqual(store.motorcycle()?.frontTyrePressurePSI, 32)
         XCTAssertEqual(store.motorcycle()?.rearTyrePressurePSI, 36)
+        XCTAssertEqual(store.motorcycle()?.chainSlackMinMillimetres, 25)
+        XCTAssertEqual(store.motorcycle()?.chainSlackMaxMillimetres, 35)
     }
 
     func test_saveMotorcycle_fails_whenNameIsMissing() {
@@ -99,5 +103,56 @@ final class SaveMotorcycleUseCaseTests: XCTestCase {
             inspection.motorcycle.requiredInspectionItems(),
             [.tyres, .finalDrive, .lights, .fluidsAndGear]
         )
+        XCTAssertNil(store.motorcycle()?.chainSlackMinMillimetres)
+        XCTAssertNil(store.motorcycle()?.chainSlackMaxMillimetres)
+    }
+
+    func test_saveMotorcycle_usesDefaultChainSlack_whenRiderLeavesItBlank() throws {
+        let saved = try useCase.save(
+            Motorcycle(
+                name: "Honda CB500F",
+                finalDrive: .chain,
+                frontTyrePressurePSI: 32,
+                rearTyrePressurePSI: 36
+            )
+        )
+
+        XCTAssertEqual(saved.chainSlackMinMillimetres, 25)
+        XCTAssertEqual(saved.chainSlackMaxMillimetres, 35)
+    }
+
+    func test_saveMotorcycle_fails_whenChainSlackMinIsHigherThanMax() {
+        let backwards = Motorcycle(
+            name: "Yamaha MT-07",
+            finalDrive: .chain,
+            frontTyrePressurePSI: 36,
+            rearTyrePressurePSI: 42,
+            chainSlackMinMillimetres: 40,
+            chainSlackMaxMillimetres: 20
+        )
+
+        XCTAssertThrowsError(try useCase.save(backwards)) { error in
+            XCTAssertEqual(error as? SaveMotorcycleError, .chainSlackOutOfRange)
+        }
+    }
+
+    func test_saveMotorcycle_replacesPhoto_whenRiderPicksANewImage() throws {
+        store.saveMotorcyclePhoto(Data("old-photo".utf8))
+
+        _ = try useCase.save(
+            Motorcycle.yamahaMT07(),
+            photo: Data("new-photo".utf8),
+            replacingPhoto: true
+        )
+
+        XCTAssertEqual(store.motorcyclePhoto(), Data("new-photo".utf8))
+    }
+
+    func test_saveMotorcycle_keepsExistingPhoto_whenProfileDetailsChange() throws {
+        store.saveMotorcyclePhoto(Data("keep-me".utf8))
+
+        _ = try useCase.save(Motorcycle.yamahaMT07())
+
+        XCTAssertEqual(store.motorcyclePhoto(), Data("keep-me".utf8))
     }
 }
