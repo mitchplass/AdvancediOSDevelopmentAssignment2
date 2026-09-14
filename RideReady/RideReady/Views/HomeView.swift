@@ -1,6 +1,7 @@
 import SwiftUI
 
 enum RideReadyRoute: Hashable {
+    case bikeProfile
     case checklist
     case itemDetail(InspectionItem)
     case rideReady
@@ -21,28 +22,57 @@ struct HomeView: View {
     var body: some View {
         NavigationStack(path: $path) {
             VStack(alignment: .leading, spacing: 16) {
-                Text(viewModel.motorcycleName)
-                    .font(.largeTitle.bold())
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        BikePhotoView(data: viewModel.motorcyclePhoto, height: 180)
 
-                Text(viewModel.streakText)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.accentColor)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.accentColor.opacity(0.12), in: Capsule())
+                        Text(viewModel.motorcycleName)
+                            .font(.largeTitle.bold())
 
-                Text(viewModel.lastCheckText)
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.background, in: RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color(uiColor: .separator), lineWidth: 1)
-                    )
+                        Button(viewModel.bikeProfileButtonTitle) {
+                            path.append(.bikeProfile)
+                        }
+                        .font(.subheadline.weight(.semibold))
 
-                Spacer()
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: viewModel.isRideReady ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                                .font(.title2)
+                                .foregroundStyle(viewModel.isRideReady ? Color.green : Color.accentColor)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(viewModel.rideReadyTitle)
+                                    .font(.headline)
+                                Text(viewModel.rideReadyDetail)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer(minLength: 0)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            (viewModel.isRideReady ? Color.green : Color.accentColor).opacity(0.12),
+                            in: RoundedRectangle(cornerRadius: 12)
+                        )
+
+                        Text(viewModel.streakText)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.accentColor)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.accentColor.opacity(0.12), in: Capsule())
+
+                        Text(viewModel.lastCheckText)
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.background, in: RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(uiColor: .separator), lineWidth: 1)
+                            )
+                    }
+                }
 
                 Button(viewModel.startButtonTitle) {
                     if viewModel.startOrContinueCheck() {
@@ -60,6 +90,8 @@ struct HomeView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: RideReadyRoute.self) { route in
                 switch route {
+                case .bikeProfile:
+                    BikeProfileView(store: store, path: $path)
                 case .checklist:
                     ChecklistView(store: store, path: $path)
                 case .itemDetail(let item):
